@@ -5,6 +5,13 @@ SRCEXT = cc
 
 RM = rm -rf
 
+#####################################################################
+#                                                                   #
+#  Convention:                                                      #
+#      main() function should be in $(SRCDIR)/main.$(SRCEXT)        #
+#                                                                   #
+#####################################################################
+
 APPNAME = pdacleaner
 
 #############################
@@ -32,7 +39,7 @@ TTARGET = $(TDIR)/run
 SOURCES = $(shell find $(SRCDIR) -type f -name "*.$(SRCEXT)")
 OBJECTS = $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 DEPS = $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.d))
-MAINOBJ = $(BUILDDIR)/$(APPNAME).o
+MAINOBJ = $(BUILDDIR)/main.o
 
 #######################################
 #      Test sources/objects/deps      #
