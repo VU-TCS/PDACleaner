@@ -27,7 +27,16 @@ class PDA {
             return strm << self.to_string();
         }
 
-        PDA(std::string name, StateSet Q, SymbolSet Gamma, PDATransitionSet Delta, SymbolString Z, State q_0, StateSet F);
+        PDA(std::string name, StateSet Q, SymbolSet Gamma,
+                PDATransitionSet Delta, SymbolString Z, State q_0, StateSet F);
+
+        StateSet * get_Q();
+        SymbolSet * get_Gamma();
+        PDATransitionSet * get_Delta();
+        SymbolString get_Z();
+        State get_q_0();
+        StateSet * get_F();
+
         bool equals(PDA const& other) const;
         std::string to_string() const;
 };

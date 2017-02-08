@@ -2,9 +2,35 @@
 
 #include <sstream>
 
-PDA::PDA(std::string name, StateSet Q, SymbolSet Gamma, PDATransitionSet Delta, SymbolString Z, State q_0, StateSet F)
+PDA::PDA(std::string name, StateSet Q, SymbolSet Gamma,
+        PDATransitionSet Delta, SymbolString Z, State q_0, StateSet F)
     : name(name), Q(Q), Gamma(Gamma), Delta(Delta), Z(Z), q_0(q_0), F(F) {}
 
+
+StateSet * PDA::get_Q() {
+    return &Q;
+}
+
+SymbolSet * PDA::get_Gamma() {
+    return &Gamma;
+}
+
+PDATransitionSet * PDA::get_Delta() {
+    return &Delta;
+}
+
+SymbolString PDA::get_Z() {
+    return Z;
+}
+
+State PDA::get_q_0() {
+    return q_0;
+}
+
+StateSet * PDA::get_F() {
+    return &F;
+}
+    
 bool PDA::equals(PDA const& other) const {
     return Q == other.Q
         && Gamma == other.Gamma

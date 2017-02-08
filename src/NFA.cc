@@ -4,7 +4,27 @@
 
 NFA::NFA(StateSet Q, SymbolSet Sigma, NFATransitionSet Delta, State q_0, StateSet F)
     : Q(Q), Sigma(Sigma), Delta(Delta), q_0(q_0), F(F) {}
+    
+StateSet * NFA::get_Q() {
+    return &Q;
+}
 
+SymbolSet * NFA::get_Sigma() {
+    return &Sigma;
+}
+
+NFATransitionSet * NFA::get_Delta() {
+    return &Delta;
+}
+
+State NFA::get_q_0() {
+    return q_0;
+}
+
+StateSet * NFA::get_F() {
+    return &F;
+}
+    
 bool NFA::equals(NFA const& other) const {
     return Q == other.Q
         && Sigma == other.Sigma

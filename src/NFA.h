@@ -26,6 +26,13 @@ class NFA {
         }
 
         NFA(StateSet Q, SymbolSet Sigma, NFATransitionSet Delta, State q_0, StateSet F);
+
+        StateSet * get_Q();
+        SymbolSet * get_Sigma();
+        NFATransitionSet * get_Delta();
+        State get_q_0();
+        StateSet * get_F();
+
         bool equals(NFA const& other) const;
         std::string to_string() const;
 };
