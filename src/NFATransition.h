@@ -10,9 +10,9 @@
  */
 class NFATransition {
     private:
-        State q;
-        Symbol symbol;
-        State r;
+        State *q;
+        Symbol *symbol;
+        State *r;
     
     public:
         friend bool operator==(NFATransition const& lhs, NFATransition const& rhs) {
@@ -23,18 +23,20 @@ class NFATransition {
             return strm << self.to_string();
         }
 
-        NFATransition(State q, Symbol symbol, State r);
+        NFATransition(State *q, Symbol *symbol, State *r);
         bool equals(NFATransition const& other) const;
         std::size_t hash() const;
         std::string to_string() const;
+        NFATransition * clone() const;
+        ~NFATransition();
 };
 
 /**
  * The hasher required for the Set.
  */
 struct NFATransitionHash {
-    inline std::size_t operator()(NFATransition const& t) const {
-        return t.hash();
+    inline std::size_t operator()(NFATransition* const& t) const {
+        return t->hash();
     }
 };
 
@@ -42,8 +44,8 @@ struct NFATransitionHash {
  * The equality checker required for the Set.
  */
 struct NFATransitionEq {
-    inline bool operator()(NFATransition const lhs, NFATransition const rhs) const {
-        return lhs.equals(rhs);
+    inline bool operator()(NFATransition const *lhs, NFATransition const *rhs) const {
+        return lhs->equals(*rhs);
     }
 };
 

@@ -12,11 +12,11 @@ enum ExtensionStatus {NO_EXTENSION, START_UP, CLOSE_DOWN};
  */
 class PDATransition {
     private:
-        State q;
-        SymbolString sigma;
+        State *q;
+        SymbolString *sigma;
         const char symbol;
-        State r;
-        SymbolString tau;
+        State *r;
+        SymbolString *tau;
         enum ExtensionStatus extension;
     
     public:
@@ -28,18 +28,20 @@ class PDATransition {
             return strm << self.to_string();
         }
 
-        PDATransition(State q, SymbolString sigma, char symbol, State r, SymbolString tau, ExtensionStatus extension = NO_EXTENSION);
+        PDATransition(State *q, SymbolString *sigma, char symbol, State *r, SymbolString *tau, ExtensionStatus extension = NO_EXTENSION);
         bool equals(PDATransition const& other) const;
         std::size_t hash() const;
         std::string to_string() const;
+        PDATransition * clone() const;
+        ~PDATransition();
 };
 
 /**
  * The hasher required for the Set.
  */
 struct PDATransitionHash {
-    inline std::size_t operator()(PDATransition const& t) const {
-        return t.hash();
+    inline std::size_t operator()(PDATransition* const& t) const {
+        return t->hash();
     }
 };
 
@@ -47,8 +49,8 @@ struct PDATransitionHash {
  * The equality checker required for the Set.
  */
 struct PDATransitionEq {
-    inline bool operator()(PDATransition const lhs, PDATransition const rhs) const {
-        return lhs.equals(rhs);
+    inline bool operator()(PDATransition const *lhs, PDATransition const *rhs) const {
+        return lhs->equals(*rhs);
     }
 };
 

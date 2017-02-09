@@ -10,11 +10,11 @@
  */
 class NFA {
     private:
-        StateSet Q;
-        SymbolSet Sigma;
-        NFATransitionSet Delta;
-        State q_0;
-        StateSet F;
+        StateSet *Q;
+        SymbolSet *Sigma;
+        NFATransitionSet *Delta;
+        State *q_0;
+        StateSet *F;
     
     public:
         friend bool operator==(NFA const& lhs, NFA const& rhs) {
@@ -25,16 +25,18 @@ class NFA {
             return strm << self.to_string();
         }
 
-        NFA(StateSet Q, SymbolSet Sigma, NFATransitionSet Delta, State q_0, StateSet F);
+        NFA(StateSet *Q, SymbolSet *Sigma, NFATransitionSet *Delta, State *q_0, StateSet *F);
 
         StateSet * get_Q();
         SymbolSet * get_Sigma();
         NFATransitionSet * get_Delta();
-        State get_q_0();
+        State * get_q_0();
         StateSet * get_F();
 
         bool equals(NFA const& other) const;
         std::string to_string() const;
+        NFA * clone() const;
+        ~NFA();
 };
 
 #endif /* NFA_H */

@@ -9,9 +9,9 @@
 #define USAGE_MSG(bin) "Usage: " + bin + " input_file [output_file]\n"
 
 void formatted_output(PDACleanerResult& result, std::ostream& stream) {    
-    stream << "U_1 = " << result.U_1.to_string("\t", "\n") << std::endl;
-    stream << "U_2 = " << result.U_2.to_string("\t", "\n") << std::endl;
-    stream << result.P_clean << std::endl;
+    stream << "U_1 = " << result.U_1->to_string("\t", "\n") << std::endl;
+    stream << "U_2 = " << result.U_2->to_string("\t", "\n") << std::endl;
+    stream << *result.P_clean << std::endl;
     stream.flush();
 }
 
@@ -52,6 +52,20 @@ PDA * read_input(char *file) {
     return P;
 }
 
+void scratch() {
+    GeneratedState s("q_e");
+
+    GeneratedState *q = StateGenerator::get().get_state();
+    GeneratedState *r = StateGenerator::get().get_state();
+
+    std::cout << s << std::endl;
+    std::cout << *q << std::endl;
+    std::cout << *r << std::endl;
+
+    delete q;
+    delete r;
+}
+
 int main(int argc, char **argv) {
     if (argc < 2) {
         std::cerr << USAGE_MSG(std::string(argv[0]));
@@ -61,7 +75,7 @@ int main(int argc, char **argv) {
     PDA *P = read_input(argv[1]);
     PDACleanerResult result = clean_PDA(P);
     print_result(argc, argv, result);
-    
+
     delete P;
     return EXIT_SUCCESS;
 }

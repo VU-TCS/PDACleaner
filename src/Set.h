@@ -9,6 +9,9 @@
  * The collection will not contain duplicate elements, as determined by
  * the hasher H and the equality checker E.
  *
+ * Type T has to have a clone() method that returns a pointer to a deep copy
+ * of the object.
+ *
  * H is a unary function object type that an object of type T as argument
  * and returns a unique value of type size_t based on that object.
  *
@@ -19,7 +22,7 @@
 template<class T, class H, class E>
 class Set {
     private:
-        std::unordered_set<T, H, E> set;
+        std::unordered_set<T *, H, E> set;
 
     public:
         friend bool operator==(Set const& lhs, Set const& rhs) {
@@ -33,9 +36,15 @@ class Set {
          * @param e The element to be added to this set.
          * @return The element that was just added to the set.
          */
-        T add(T e) {
-            set.insert(e);
-            return e;
+        T * add(T *e) {
+            auto it = set.find(e);
+            if (it != set.end()) {
+                return *it;
+            }
+
+            T *n = e->clone();
+            set.insert(n);
+            return n;
         }
 
         /**
@@ -45,8 +54,13 @@ class Set {
          * @param e The element to be removed from this set.
          * @return true if this set contained the specified element.
          */
-        bool remove(T e) {
-            return set.erase(e) == 1;
+        bool remove(T *e) {
+            auto it = set.find(e);
+            if (it != set.end()) {
+                delete *it;
+                return set.erase(*it) == 1;
+            }
+            return false;
         }
 
         /**
@@ -55,7 +69,7 @@ class Set {
          * @param e The element whose presence in this set is to be tested.
          * @return true if this set contains the specified element.
          */
-        bool contains(T e) const {
+        bool contains(T *e) const {
             return !(set.find(e) == set.end());
         }
 
@@ -83,7 +97,7 @@ class Set {
          *
          * @return An iterator pointing to the first element in this set.
          */
-         typename std::unordered_set<T, H, E>::const_iterator begin() const {
+         typename std::unordered_set<T *, H, E>::const_iterator begin() const {
              return set.begin();
          }
 
@@ -93,7 +107,7 @@ class Set {
          *
          * @return An iterator pointing to the past-the-end element of this set.
          */
-        typename std::unordered_set<T, H, E>::const_iterator end() const {
+        typename std::unordered_set<T *, H, E>::const_iterator end() const {
             return set.end();
         }
 
@@ -122,18 +136,40 @@ class Set {
          *
          * @param pre The string to be prepended to every element
          * @param post The string to be appended to every element
-         * @return a string representation of this set.
+         * @return A string representation of this set.
          */
         std::string to_string(std::string pre, std::string post) const {
             std::stringstream ss;
 
             ss << "{" << post;
             for (auto it = set.begin(); it != set.end(); it++) {
-                ss << pre << *it << post;
+                ss << pre << **it << post;
             }
             ss << "}";
 
             return ss.str();
+        }
+
+        /**
+         * Returns a pointer to a deep copy of the set.
+         * All elements in the new set are copies of the elements in the set.
+         *
+         * @return A pointer to a deep copy of the set.
+         */
+        Set<T, H, E> * clone() const {
+            Set<T, H, E> *clone_set = new Set<T, H, E>;
+
+            for (auto it = set.begin(); it != set.end(); it++) {
+                clone_set->add(*it);
+            }
+
+            return clone_set;
+        }
+
+        ~Set() {
+            for (auto it = set.begin(); it != set.end(); it++) {
+                delete *it;
+            }
         }
 };
 
