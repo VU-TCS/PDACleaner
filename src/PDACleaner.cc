@@ -4,62 +4,44 @@
 
 static PDA * simplify_PDA(PDA *P) {
     Bottom b_0;
-    GeneratedState *q_0_hat = new GeneratedState("q_0_hat");
-    GeneratedState *q_e = new GeneratedState("q_e");
-    GeneratedState *q_f = new GeneratedState("q_f");
+    GeneratedState q_0_hat("q_0_hat");
+    GeneratedState q_e("q_e");
+    GeneratedState q_f("q_f");
+    SymbolString Z;
+    Z.append(&b_0);
+    StateSet F;
+    F.add(&q_f);
+
+    PDA *P_0 = new PDA("P_0", P->get_Q(), P->get_Gamma(), P->get_Delta(), &Z, &q_0_hat, &F);
 
     // StateSet
-    StateSet *Q = P->get_Q()->clone();
-    Q->add(q_0_hat);
-    Q->add(q_e);
-    Q->add(q_f);
+    P_0->get_Q()->add(&q_0_hat);
+    P_0->get_Q()->add(&q_e);
+    P_0->get_Q()->add(&q_f);
 
     // SymbolSet
-    SymbolSet *Gamma = P->get_Gamma()->clone();
-    Gamma->add(&b_0);
-
-    // Initial stack string
-    SymbolString *Z = new SymbolString();
-    Z->append(&b_0);
-
-    // TransitionSet
-    PDATransitionSet *Delta = P->get_Delta()->clone();
+    P_0->get_Gamma()->add(&b_0);
 
     // Add necessary transitions to Delta
     SymbolString empty_string;
     
-    PDATransition t(q_0_hat->clone(), empty_string.clone(), 0,
-            P->get_q_0()->clone(), P->get_Z()->clone(), START_UP);
-    Delta->add(&t);
+    PDATransition t(&q_0_hat, &empty_string, 0, P->get_q_0(), P->get_Z(), START_UP);
+    P_0->get_Delta()->add(&t);
     
     for (auto it = P->get_F()->begin(); it != P->get_F()->end(); it++) {
-        PDATransition t((*it)->clone(), empty_string.clone(), 0,
-                q_e->clone(), empty_string.clone(), CLOSE_DOWN);
-        Delta->add(&t);
+        PDATransition t(*it, &empty_string, 0, &q_e, &empty_string, CLOSE_DOWN);
+        P_0->get_Delta()->add(&t);
     }
 
     for (auto it = P->get_Gamma()->begin(); it != P->get_Gamma()->end(); it++) {
         SymbolString pop;
         pop.append(*it);
-        PDATransition t(q_e->clone(), pop.clone(), 0,
-                q_e->clone(), empty_string.clone(), CLOSE_DOWN);
-        Delta->add(&t);
+        PDATransition t(&q_e, &pop, 0, &q_e, &empty_string, CLOSE_DOWN);
+        P_0->get_Delta()->add(&t);
     }
 
-    PDATransition r(q_e->clone(), Z->clone(), 0,
-            q_f->clone(), empty_string.clone(), CLOSE_DOWN);
-    Delta->add(&r);
-
-    // Create new Final set with single final state
-    StateSet *F = new StateSet();
-    F->add(q_f);
-
-    //Construct PDA
-    PDA *P_0 = new PDA("P_0", Q, Gamma, Delta, Z, q_0_hat, F);
-
-    // Safe to delete
-    delete q_e;
-    delete q_f;
+    PDATransition r(&q_e, &Z, 0, &q_f, &empty_string, CLOSE_DOWN);
+    P_0->get_Delta()->add(&r);
 
     return P_0;
 }

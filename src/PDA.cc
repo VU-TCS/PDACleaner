@@ -3,9 +3,15 @@
 #include <sstream>
 
 PDA::PDA(std::string name, StateSet *Q, SymbolSet *Gamma,
-        PDATransitionSet *Delta, SymbolString *Z, State *q_0, StateSet *F)
-    : name(name), Q(Q), Gamma(Gamma), Delta(Delta), Z(Z), q_0(q_0), F(F) {}
-
+        PDATransitionSet *Delta, SymbolString *Z, State *q_0, StateSet *F) {
+    this->name = name;
+    this->Q = Q->clone();
+    this->Gamma = Gamma->clone();
+    this->Delta = Delta->clone();
+    this->Z = Z->clone();
+    this->q_0 = q_0->clone();
+    this->F = F->clone();
+}
 
 StateSet * PDA::get_Q() {
     return Q;
@@ -56,8 +62,7 @@ std::string PDA::to_string() const {
 }
 
 PDA * PDA::clone() const {
-    return new PDA(name, Q->clone(), Gamma->clone(),
-            Delta->clone(), Z->clone(), q_0->clone(), F->clone());
+    return new PDA(name, Q, Gamma, Delta, Z, q_0, F);
 }
 
 PDA::~PDA() {

@@ -4,7 +4,7 @@
 #include <fstream>
 #include <stdexcept>
 
-void read_word(std::ifstream& input, std::string word) {
+static void read_word(std::ifstream& input, std::string word) {
     std::string read;
     input >> std::skipws >> read;
 
@@ -15,7 +15,7 @@ void read_word(std::ifstream& input, std::string word) {
     }
 }
 
-void read_char(std::ifstream& input, char c) {
+static void read_char(std::ifstream& input, char c) {
     char read;
     input >> std::skipws >> read;
 
@@ -26,7 +26,7 @@ void read_char(std::ifstream& input, char c) {
     }
 }
 
-char read_input_symbol(std::ifstream& input) {
+static char read_input_symbol(std::ifstream& input) {
     read_char(input, '"');
     
     char c;
@@ -40,13 +40,13 @@ char read_input_symbol(std::ifstream& input) {
     return c;
 }
 
-Symbol * read_Symbol(std::ifstream& input) {
+static Symbol * read_Symbol(std::ifstream& input) {
     char c;
     input >> c;
     return new Character(c);
 }
 
-SymbolString * read_SymbolString(std::ifstream& input, SymbolSet *Gamma) {
+static SymbolString * read_SymbolString(std::ifstream& input, SymbolSet *Gamma) {
     read_char(input, '"');
     
     SymbolString *str = new SymbolString;
@@ -67,13 +67,13 @@ SymbolString * read_SymbolString(std::ifstream& input, SymbolSet *Gamma) {
     return str;
 }
 
-State * read_State(std::ifstream& input) {
+static State * read_State(std::ifstream& input) {
     int i;
     input >> i;
     return new SimpleState(i);
 }
 
-StateSet * read_F(std::ifstream& input, StateSet *Q) {
+static StateSet * read_F(std::ifstream& input, StateSet *Q) {
     read_char(input, 'F');
     read_char(input, '=');
     read_char(input, '{');
@@ -96,7 +96,7 @@ StateSet * read_F(std::ifstream& input, StateSet *Q) {
     return F;
 }
 
-State * read_q_0(std::ifstream& input, StateSet *Q) {
+static State * read_q_0(std::ifstream& input, StateSet *Q) {
     read_word(input, "q_0");
     read_char(input, '=');
     
@@ -108,13 +108,13 @@ State * read_q_0(std::ifstream& input, StateSet *Q) {
     return q_0;
 }
 
-SymbolString * read_Z(std::ifstream& input, SymbolSet *Gamma) {
+static SymbolString * read_Z(std::ifstream& input, SymbolSet *Gamma) {
     read_char(input, 'Z');
     read_char(input, '=');
     return read_SymbolString(input, Gamma);
 }
 
-PDATransition * read_PDATransition(std::ifstream& input, StateSet *Q, SymbolSet *Gamma) {
+static PDATransition * read_PDATransition(std::ifstream& input, StateSet *Q, SymbolSet *Gamma) {
     read_char(input, '(');
     
     State *q = read_State(input);
@@ -138,10 +138,17 @@ PDATransition * read_PDATransition(std::ifstream& input, StateSet *Q, SymbolSet 
     SymbolString *tau = read_SymbolString(input, Gamma);
     read_char(input, ')');
 
-    return new PDATransition(q, sigma, symbol, r, tau);
+    PDATransition *t = new PDATransition(q, sigma, symbol, r, tau);
+
+    delete q;
+    delete sigma;
+    delete r;
+    delete tau;
+
+    return t;
 }
 
-PDATransitionSet * read_Delta(std::ifstream& input, StateSet *Q, SymbolSet *Gamma) {
+static PDATransitionSet * read_Delta(std::ifstream& input, StateSet *Q, SymbolSet *Gamma) {
     read_word(input, "Delta");
     read_char(input, '=');
     read_char(input, '{');
@@ -159,7 +166,7 @@ PDATransitionSet * read_Delta(std::ifstream& input, StateSet *Q, SymbolSet *Gamm
     return Delta;
 }
 
-SymbolSet * read_Gamma(std::ifstream& input) {
+static SymbolSet * read_Gamma(std::ifstream& input) {
     read_word(input, "Gamma");
     read_char(input, '=');
     read_char(input, '{');
@@ -177,7 +184,7 @@ SymbolSet * read_Gamma(std::ifstream& input) {
     return Gamma;
 }
 
-StateSet * read_Q(std::ifstream& input) {
+static StateSet * read_Q(std::ifstream& input) {
     read_char(input, 'Q');
     read_char(input, '=');
     read_char(input, '{');
@@ -195,7 +202,7 @@ StateSet * read_Q(std::ifstream& input) {
     return Q;
 }
 
-std::string read_name(std::ifstream& input) {
+static std::string read_name(std::ifstream& input) {
     std::string name;
     input >> std::skipws >> name;
     return name;
@@ -224,5 +231,14 @@ PDA * parse_PDA(std::ifstream& input) {
     StateSet *F = read_F(input, Q);
     read_char(input, '}');
 
-    return new PDA(name, Q, Gamma, Delta, Z, q_0, F);
+    PDA *P = new PDA(name, Q, Gamma, Delta, Z, q_0, F);
+
+    delete Q;
+    delete Gamma;
+    delete Delta;
+    delete Z;
+    delete q_0;
+    delete F;
+
+    return P;
 }

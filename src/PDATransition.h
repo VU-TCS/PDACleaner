@@ -14,7 +14,7 @@ class PDATransition {
     private:
         State *q;
         SymbolString *sigma;
-        const char symbol;
+        char symbol;
         State *r;
         SymbolString *tau;
         enum ExtensionStatus extension;

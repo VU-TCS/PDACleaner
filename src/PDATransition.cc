@@ -2,8 +2,14 @@
 
 #include <sstream>
 
-PDATransition::PDATransition(State *q, SymbolString *sigma, char symbol, State *r, SymbolString *tau, ExtensionStatus extension)
-    : q(q), sigma(sigma), symbol(symbol), r(r), tau(tau), extension(extension) {}
+PDATransition::PDATransition(State *q, SymbolString *sigma, char symbol, State *r, SymbolString *tau, ExtensionStatus extension) {
+    this->q = q->clone();
+    this->sigma = sigma->clone();
+    this->symbol = symbol;
+    this->r = r->clone();
+    this->tau = tau->clone();
+    this->extension = extension;
+}
 
 bool PDATransition::equals(PDATransition const& other) const {
     return q->equals(*other.q)
@@ -35,8 +41,7 @@ std::string PDATransition::to_string() const {
 }
 
 PDATransition * PDATransition::clone() const {
-    return new PDATransition(q->clone(), sigma->clone(),
-            symbol, r->clone(), tau->clone(), extension);
+    return new PDATransition(q, sigma, symbol, r, tau, extension);
 }
 
 PDATransition::~PDATransition() {
