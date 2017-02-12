@@ -30,7 +30,7 @@ class Set {
         }
 
         /**
-         * Adds the specified element to this set if it was not already present.
+         * Adds a copy of the specified element to this set if it was not already present.
          * If this set already contains the element, the call leaves the set unchanged.
          * 
          * @param e The element to be added to this set.
@@ -47,6 +47,11 @@ class Set {
             return n;
         }
 
+        /**
+         * Adds all elements of the other set to this set.
+         *
+         * @param other A pointer to the the set whose elements are to be added.
+         */
         void add_all(Set<T, H, E> *other) {
             for (auto it = other->begin(); it != other->end(); it++) {
                 add(*it);
@@ -99,6 +104,9 @@ class Set {
             return set.empty();
         }
 
+        /**
+         * Empties the set.
+         */
         void clear() {
             for (auto it = set.begin(); it != set.end(); it++) {
                 delete *it;

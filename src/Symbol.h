@@ -80,7 +80,7 @@ class Identifier : public Symbol {
 extern Epsilon EPSILON;
 
 /**
- * The hasher required for the PointerSet.
+ * The hasher required for the Set.
  */
 struct SymbolHash {
     inline std::size_t operator()(Symbol* const& s) const {
@@ -89,7 +89,7 @@ struct SymbolHash {
 };
 
 /**
- * The equility checker required for the PointerSet.
+ * The equality checker required for the Set.
  */
 struct SymbolEq {
     inline bool operator()(Symbol const *lhs, Symbol const *rhs) const {
@@ -100,7 +100,7 @@ struct SymbolEq {
 typedef Set<Symbol, SymbolHash, SymbolEq> SymbolSet;
 
 /**
- * Represents a symbolstring to reprsent stack strings in a PDA and in a PDATransition.
+ * Represents a symbolstring to form stack strings in a PDA and in a PDATransition.
  */
 class SymbolString {
     private:
