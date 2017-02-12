@@ -6,8 +6,12 @@
 #include "Sqs.h"
 #include "BMap.h"
 
-static State * forward_4(SymbolString *s, State *z, NFA *N, BMap *b_map) {
-    int k = s->length();
+/**
+ * Establishes a path (y, a, z) in N and returns State y, which may be a newly created State.
+ * Corresponds to Algorithm 2 (step 4 of forward) described in the paper.
+ */
+static State * forward_4(SymbolString *a, State *z, NFA *N, BMap *b_map) {
+    int k = a->length();
 
     if (k == 0)
         return z->clone();
@@ -17,8 +21,8 @@ static State * forward_4(SymbolString *s, State *z, NFA *N, BMap *b_map) {
         Symbol *symbol = (*it)->get_symbol();
         State *r = (*it)->get_r();
 
-        if (symbol->equals(*s->symbol_at(k - 1)) && r->equals(*z)) {
-            SymbolString *truncated = s->truncated(1);
+        if (symbol->equals(*a->symbol_at(k - 1)) && r->equals(*z)) {
+            SymbolString *truncated = a->truncated(1);
             State *y = forward_4(truncated, q, N, b_map);
             delete truncated;
 
@@ -30,7 +34,7 @@ static State * forward_4(SymbolString *s, State *z, NFA *N, BMap *b_map) {
     State *n_2 = z->clone();
 
     for (int i = k - 1; i >= 0; i--) {
-        NFATransition t(n_1, s->symbol_at(i), n_2);
+        NFATransition t(n_1, a->symbol_at(i), n_2);
 
         N->get_Q()->add(n_1);
         b_map->get(n_1)->add(n_1);
@@ -46,6 +50,10 @@ static State * forward_4(SymbolString *s, State *z, NFA *N, BMap *b_map) {
     return n_1;
 }
 
+/**
+ * Determines the largest set of States in N, such that each of them can reach
+ * a state in the specified set via a path of epsilon transitions only.
+ */
 static StateSet * backwards_epsilon_closure(NFA *N, StateSet *set, BMap *b_map) {
     StateSet *set_prime = set->clone();
 
@@ -56,7 +64,11 @@ static StateSet * backwards_epsilon_closure(NFA *N, StateSet *set, BMap *b_map) 
     return set_prime;
 }
 
-static void fill_Sqs(Sqs *sqs_map, State *q, SymbolString *s, NFA *N, BMap *b_map) {
+/**
+ * Determines the sqs set for State q and SymbolString s.
+ * Enters this set into the pecified Sqs map.
+ */
+static void determine_Sqs(Sqs *sqs_map, State *q, SymbolString *s, NFA *N, BMap *b_map) {
     SymbolString *s_reversed = s->reverse();
     StateSet *set = sqs_map->get(q, s);
     set->add(q);
@@ -82,17 +94,21 @@ static void fill_Sqs(Sqs *sqs_map, State *q, SymbolString *s, NFA *N, BMap *b_ma
     delete s_reversed;
 }
 
+/**
+ * Detects unreachable transitions in P_0.
+ * Corresponds to Algorithm 1 (Procedure forward) described in the paper.
+ */
 static void forward(PDA *P_0, NFA *N, PDATransitionSet *U_1, Sqs *sqs_map, BMap *b_map) {
-    for (auto it = P_0->get_Delta()->begin(); it != P_0->get_Delta()->end(); it++) {
-        State *q = (*it)->get_q();
-        SymbolString *sigma = (*it)->get_sigma();
-        SymbolString *tau = (*it)->get_tau();
-        State *r = (*it)->get_r();
+    for (auto theta = P_0->get_Delta()->begin(); theta != P_0->get_Delta()->end(); theta++) {
+        State *q = (*theta)->get_q();
+        SymbolString *sigma = (*theta)->get_sigma();
+        SymbolString *tau = (*theta)->get_tau();
+        State *r = (*theta)->get_r();
 
         if (!N->get_Q()->contains(q))
             continue;
 
-        fill_Sqs(sqs_map, q, sigma, N, b_map);
+        determine_Sqs(sqs_map, q, sigma, N, b_map);
 
         StateSet *sqs = sqs_map->get(q, sigma);
         if (sqs->size() == 0)
@@ -100,8 +116,8 @@ static void forward(PDA *P_0, NFA *N, PDATransitionSet *U_1, Sqs *sqs_map, BMap 
 
         SymbolString *tau_reversed = tau->reverse();
         
-        if (U_1->contains(*it)) {
-            U_1->remove(*it);
+        if (U_1->contains(*theta)) {
+            U_1->remove(*theta);
             
             State *tmp = forward_4(tau_reversed, r, N, b_map);
             delete tmp;
@@ -114,20 +130,20 @@ static void forward(PDA *P_0, NFA *N, PDATransitionSet *U_1, Sqs *sqs_map, BMap 
         NFATransitionSet *Delta = N->get_Delta();
         State *y = forward_4(tau_reversed, r, N, b_map);
 
-        for (auto s_it = sqs->begin(); s_it != sqs->end(); s_it++) {
-            NFATransition t(*s_it, &EPSILON, y);
+        for (auto x = sqs->begin(); x != sqs->end(); x++) {
+            NFATransition t(*x, &EPSILON, y);
             
             if (!Delta->contains(&t)) {
                 Delta->add(&t);
 
+                // Merge BMap entries.
                 for (auto b_it = b_map->begin(); b_it != b_map->end(); b_it++) {
-                    //State *b_state = b_it->first;
                     StateSet *b_set = b_it->second;
 
                     if (!b_set->contains(y))
                         continue;
 
-                    b_set->add_all(b_map->get(*s_it));
+                    b_set->add_all(b_map->get(*x));
                 }
             }
         }
@@ -137,6 +153,11 @@ static void forward(PDA *P_0, NFA *N, PDATransitionSet *U_1, Sqs *sqs_map, BMap 
     }
 }
 
+/**
+ * Builds the NFA N that represents all reachable configurations in P_0.
+ * Also removes reachable transitions from U_1, which in the end will
+ * contain all unreachable transitions of P_0.
+ */
 static NFA * build_NFA(PDA *P_0, PDATransitionSet *U_1, Sqs *sqs_map) {
     BMap *b_map = new BMap();
     
@@ -236,9 +257,8 @@ PDACleanerResult clean_PDA(PDA *P) {
     
     NFA *N = build_NFA(P_0, U_1, sqs_map);
 
-    std::cout << "NFA N = " << *N << std::endl;
-
     PDACleanerResult result = { U_1, U_2, P_0 };
+    
     delete sqs_map;
     delete N;
     return result;

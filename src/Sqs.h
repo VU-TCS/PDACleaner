@@ -6,6 +6,10 @@
 #include "State.h"
 #include "Symbol.h"
 
+/**
+ * To be used as a key value in the Sqs map.
+ * Not to be instantiated by users.
+ */
 class SqsKey {
     private:
         State *q;
@@ -37,12 +41,24 @@ struct SqsKeyEq {
     }
 };
 
+/**
+ * A (State, SymbolString)-StateSet map.
+ */
 class Sqs {
     private:
         std::unordered_map<SqsKey *, StateSet *, SqsKeyHash, SqsKeyEq> map;
     public:
+        /**
+         * Returns the StateSet mapped to the specified State-Symbolstring combination.
+         * If such a set does not exist, one is allocated and returned.
+         */
         StateSet * get(State *q, SymbolString *s);
+
+        /**
+         * Empty the map.
+         */
         void clear();
+
         ~Sqs();
 };
 

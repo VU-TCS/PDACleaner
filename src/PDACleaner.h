@@ -3,7 +3,6 @@
 
 #include "PDA.h"
 
-
 /**
  * A structure that contains the ouput of clean_PDA().
  * U_1 contains all unreachable transitions.
@@ -22,14 +21,12 @@ struct PDACleanerResult {
     }
 };
 
-
 /**
  * Detects all useless transitions in the specified PDA.
- * Returns a pointer to a heap-allocated PDACleanerResult object.
- * The caller is responsible for freeing the memory.
+ * Returns a PDACleanerResult object whose members are allocated on the heap.
  *
  * @param P A pointer to the PDA to clean.
- * @return A pointer to a PDACleanerResult object allocated on the heap.
+ * @return A PDACleanerResult object.
  */
 PDACleanerResult clean_PDA(PDA *P);
 

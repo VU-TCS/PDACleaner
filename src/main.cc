@@ -52,20 +52,6 @@ PDA * read_input(char *file) {
     return P;
 }
 
-void scratch() {
-    GeneratedState s("q_e");
-
-    GeneratedState *q = StateGenerator::get().get_state();
-    GeneratedState *r = StateGenerator::get().get_state();
-
-    std::cout << s << std::endl;
-    std::cout << *q << std::endl;
-    std::cout << *r << std::endl;
-
-    delete q;
-    delete r;
-}
-
 int main(int argc, char **argv) {
     if (argc < 2) {
         std::cerr << USAGE_MSG(std::string(argv[0]));
