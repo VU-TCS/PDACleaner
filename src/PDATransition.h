@@ -29,6 +29,14 @@ class PDATransition {
         }
 
         PDATransition(State *q, SymbolString *sigma, char symbol, State *r, SymbolString *tau, ExtensionStatus extension = NO_EXTENSION);
+
+        State * get_q();
+        SymbolString * get_sigma();
+        char get_symbol();
+        State * get_r();
+        SymbolString * get_tau();
+        ExtensionStatus get_ext_status();
+
         bool equals(PDATransition const& other) const;
         std::size_t hash() const;
         std::string to_string() const;

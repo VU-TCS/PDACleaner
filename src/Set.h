@@ -47,6 +47,12 @@ class Set {
             return n;
         }
 
+        void add_all(Set<T, H, E> *other) {
+            for (auto it = other->begin(); it != other->end(); it++) {
+                add(*it);
+            }
+        }
+
         /**
          * Removes the specified element from this set if it is present.
          * Returns true if this set changed as a result of the call.
@@ -57,8 +63,10 @@ class Set {
         bool remove(T *e) {
             auto it = set.find(e);
             if (it != set.end()) {
-                delete *it;
-                return set.erase(*it) == 1;
+                T *d = *it;
+                set.erase(*it);
+                delete d;
+                return true;
             }
             return false;
         }
@@ -89,6 +97,14 @@ class Set {
          */
         bool is_empty() {
             return set.empty();
+        }
+
+        void clear() {
+            for (auto it = set.begin(); it != set.end(); it++) {
+                delete *it;
+            }
+
+            set.clear();
         }
 
         /**

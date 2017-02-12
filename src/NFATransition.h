@@ -24,6 +24,11 @@ class NFATransition {
         }
 
         NFATransition(State *q, Symbol *symbol, State *r);
+
+        State * get_q();
+        Symbol * get_symbol();
+        State * get_r();
+
         bool equals(NFATransition const& other) const;
         std::size_t hash() const;
         std::string to_string() const;

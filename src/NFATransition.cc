@@ -8,6 +8,18 @@ NFATransition::NFATransition(State *q, Symbol *symbol, State *r) {
     this->r = r->clone();
 }
 
+State * NFATransition::get_q() {
+    return q;
+}
+
+Symbol * NFATransition::get_symbol() {
+    return symbol;
+}
+
+State * NFATransition::get_r() {
+    return r;
+}
+
 bool NFATransition::equals(NFATransition const& other) const {
     return q->equals(*other.q)
         && symbol->equals(*other.symbol)
@@ -25,7 +37,7 @@ std::size_t NFATransition::hash() const {
 std::string NFATransition::to_string() const {
     std::stringstream ss;
 
-    ss << "{" << *q << ", " << *symbol << ", " << *r << "}";
+    ss << "(" << *q << ", '" << *symbol << "', " << *r << ")";
 
     return ss.str();
 }

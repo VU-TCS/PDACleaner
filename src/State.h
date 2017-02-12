@@ -96,7 +96,7 @@ class StateGenerator {
 };
 
 /**
- * The hasher required for the PointerSet.
+ * The hasher required for the Set.
  */
 struct StateHash {
     inline std::size_t operator()(State* const& s) const {

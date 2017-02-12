@@ -5,7 +5,10 @@
 /*** EPSILON ***/
 
 bool Epsilon::equals(Symbol const& other) const {
-    return this == &other;
+    if (dynamic_cast<Epsilon const *> (&other)) {
+        return true;
+    }
+    return false;
 }
     
 std::size_t Epsilon::hash() const {
@@ -17,7 +20,7 @@ std::string Epsilon::to_string() const {
 }
 
 Symbol * Epsilon::clone() const {
-    return &(this->get());
+    return new Epsilon();
 }
 
 /*** Bottom ***/
@@ -87,6 +90,8 @@ Symbol * Identifier::clone() const {
     return new Identifier(identifier);
 }
 
+Epsilon EPSILON;
+
 /*** SymbolString ***/
 
 void SymbolString::append(Symbol *s) {
@@ -99,6 +104,31 @@ Symbol * SymbolString::symbol_at(std::size_t i) const {
 
 std::size_t SymbolString::length() const {
     return string.size();
+}
+
+SymbolString * SymbolString::reverse() const {
+    SymbolString *reversed = new SymbolString();
+    
+    for (auto it = string.rbegin(); it != string.rend(); it++) {
+        reversed->append(*it);
+    }
+
+    return reversed;
+}
+
+SymbolString * SymbolString::truncated(std::size_t k) const {
+    SymbolString *truncated = new SymbolString();
+    int remaining = length() - k;
+ 
+    for (auto it = string.begin(); it != string.end(); it++) {
+        if (remaining <= 0)
+            break;
+
+        truncated->append(*it);
+        remaining--;
+    }
+
+    return truncated;
 }
 
 bool SymbolString::equals(SymbolString const& other) const {

@@ -11,6 +11,30 @@ PDATransition::PDATransition(State *q, SymbolString *sigma, char symbol, State *
     this->extension = extension;
 }
 
+State * PDATransition::get_q() {
+    return q;
+}
+
+SymbolString * PDATransition::get_sigma() {
+    return sigma;
+}
+
+char PDATransition::get_symbol() {
+    return symbol;
+}
+
+State * PDATransition::get_r() {
+    return r;
+}
+
+SymbolString * PDATransition::get_tau() {
+    return tau;
+}
+
+ExtensionStatus PDATransition::get_ext_status() {
+    return extension;
+}
+
 bool PDATransition::equals(PDATransition const& other) const {
     return q->equals(*other.q)
         && sigma->equals(*other.sigma)

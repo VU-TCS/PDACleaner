@@ -2,8 +2,13 @@
 
 #include <sstream>
 
-NFA::NFA(StateSet *Q, SymbolSet *Sigma, NFATransitionSet *Delta, State *q_0, StateSet *F)
-    : Q(Q), Sigma(Sigma), Delta(Delta), q_0(q_0), F(F) {}
+NFA::NFA(StateSet *Q, SymbolSet *Sigma, NFATransitionSet *Delta, State *q_0, StateSet *F) {
+    this->Q = Q->clone();
+    this->Sigma = Sigma->clone();
+    this->Delta = Delta->clone();
+    this->q_0 = q_0->clone();
+    this->F = F->clone();
+}
     
 StateSet * NFA::get_Q() {
     return Q;
@@ -48,7 +53,7 @@ std::string NFA::to_string() const {
 }
 
 NFA * NFA::clone() const {
-    return new NFA(Q->clone(), Sigma->clone(), Delta->clone(), q_0->clone(), F->clone());
+    return new NFA(Q, Sigma, Delta, q_0, F);
 }
 
 NFA::~NFA() {

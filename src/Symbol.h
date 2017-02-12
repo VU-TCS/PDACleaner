@@ -26,21 +26,10 @@ class Symbol {
 };  
 
 /** 
- * A singleton class representing the epsilon Symbol.
+ * The epsilon Symbol.
  */ 
 class Epsilon : public Symbol {
-    private:
-        Epsilon() {}
-
     public:
-        static Epsilon& get() {
-            static Epsilon instance;
-            return instance;
-        }
-
-        Epsilon(Epsilon const&) = delete;
-        void operator=(Epsilon const&) = delete;
-
         bool equals(Symbol const& other) const;
         std::size_t hash() const;
         std::string to_string() const;
@@ -88,6 +77,8 @@ class Identifier : public Symbol {
         Symbol * clone() const;
 };
 
+extern Epsilon EPSILON;
+
 /**
  * The hasher required for the PointerSet.
  */
@@ -127,6 +118,8 @@ class SymbolString {
         void append(Symbol *s);
         Symbol * symbol_at(std::size_t i) const;
         std::size_t length() const;
+        SymbolString * reverse() const;
+        SymbolString * truncated(std::size_t k) const;
         bool equals(SymbolString const& other) const;
         std::size_t hash() const;
         std::string to_string() const;
