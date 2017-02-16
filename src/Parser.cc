@@ -57,7 +57,11 @@ static SymbolString * read_SymbolString(std::ifstream& input, SymbolSet *Gamma) 
         str->append(s);
 
         if (!Gamma->contains(s)) {
-            throw std::invalid_argument("Symbol " + s->to_string() + " not contained in Gamma.");
+            //throw std::invalid_argument("Symbol " + s->to_string() + " not contained in Gamma.");
+            
+            // Instead of throwing an exception, silently add the Symbol to Gamma.
+            // This just makes writing the input files (especially large PDAs) much easier.
+            Gamma->add(s);
         }
 
         delete s;
@@ -86,7 +90,11 @@ static StateSet * read_F(std::ifstream& input, StateSet *Q) {
         F->add(s);
 
         if (!Q->contains(s)) {
-            throw std::invalid_argument("Final state " + s->to_string() + " not contained in Q.");
+            //throw std::invalid_argument("Final state " + s->to_string() + " not contained in Q.");
+            
+            // Instead of throwing an exception, silently add the State to Q.
+            // This just makes writing the input files (especially large PDAs) much easier.
+            Q->add(s);
         }
 
         delete s;
@@ -102,7 +110,11 @@ static State * read_q_0(std::ifstream& input, StateSet *Q) {
     
     State *q_0 = read_State(input);
     if (!Q->contains(q_0)) {
-        throw std::invalid_argument("Initial state q_0 = " + q_0->to_string() + " not contained in Q.");
+        //throw std::invalid_argument("Initial state q_0 = " + q_0->to_string() + " not contained in Q.");
+            
+        // Instead of throwing an exception, silently add the State to Q.
+        // This just makes writing the input files (especially large PDAs) much easier.
+        Q->add(q_0);
     }
 
     return q_0;
@@ -119,7 +131,11 @@ static PDATransition * read_PDATransition(std::ifstream& input, StateSet *Q, Sym
     
     State *q = read_State(input);
     if (!Q->contains(q)) {
-        throw std::invalid_argument("State " + q->to_string() + " not contained in Q.");
+        //throw std::invalid_argument("State " + q->to_string() + " not contained in Q.");
+        
+        // Instead of throwing an exception, silently add the State to Q.
+        // This just makes writing the input files (especially large PDAs) much easier.
+        Q->add(q);
     }
     read_char(input, ',');
 
@@ -131,7 +147,11 @@ static PDATransition * read_PDATransition(std::ifstream& input, StateSet *Q, Sym
     
     State *r = read_State(input);
     if (!Q->contains(r)) {
-        throw std::invalid_argument("State " + r->to_string() + " not contained in Q.");
+        //throw std::invalid_argument("State " + r->to_string() + " not contained in Q.");
+        
+        // Instead of throwing an exception, silently add the State to Q.
+        // This just makes writing the input files (especially large PDAs) much easier.
+        Q->add(r);
     }
     read_char(input, ',');
     
