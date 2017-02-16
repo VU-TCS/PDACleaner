@@ -117,8 +117,9 @@ class SymbolString {
 
         void append(Symbol *s);
         Symbol * symbol_at(std::size_t i) const;
+        void truncate(int k);
         std::size_t length() const;
-        SymbolString * reverse() const;
+        SymbolString * reversed() const;
         SymbolString * truncated(std::size_t k) const;
         bool equals(SymbolString const& other) const;
         std::size_t hash() const;

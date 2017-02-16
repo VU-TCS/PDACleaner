@@ -1,17 +1,17 @@
 CC = g++
 CFLAGS = -O3 -Wall -Werror
+
+# Compiler flags for automatic dependency generation
 DEPFLAGS = -MT $@ -MMD
+
 SRCEXT = cc
 
 RM = rm -rf
 
-#####################################################################
-#                                                                   #
-#  Convention:                                                      #
-#      main() function should be in $(SRCDIR)/main.$(SRCEXT)        #
-#                                                                   #
-#####################################################################
+# Source file containing main() function, *without* extension
+MAIN = main
 
+# Name that will be given to the executable
 APPNAME = pdacleaner
 
 #############################
@@ -39,7 +39,7 @@ TTARGET = $(TDIR)/run
 SOURCES = $(shell find $(SRCDIR) -type f -name "*.$(SRCEXT)")
 OBJECTS = $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 DEPS = $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.d))
-MAINOBJ = $(BUILDDIR)/main.o
+MAINOBJ = $(BUILDDIR)/$(MAIN).o
 
 #######################################
 #      Test sources/objects/deps      #
@@ -54,7 +54,9 @@ TDEPS = $(patsubst $(TSRCDIR)/%,$(TBUILDDIR)/%,$(TSOURCES:.$(SRCEXT)=.d))
 #      App lib/inc      #
 #########################
 
-LIB = 
+LIB =
+
+# If necessary, set INC = -I <incdir1> -I <incdir2>
 INC =
 
 ##########################

@@ -40,7 +40,7 @@ TEST_F(SymbolTest, StringReverse) {
     exp.append(B);
     exp.append(A);
 
-    SymbolString *rev = string.reverse();
+    SymbolString *rev = string.reversed();
     EXPECT_TRUE(exp.equals(*rev));
     delete rev;
 }

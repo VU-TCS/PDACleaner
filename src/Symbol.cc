@@ -95,18 +95,33 @@ Epsilon EPSILON;
 /*** SymbolString ***/
 
 void SymbolString::append(Symbol *s) {
+    if (s->equals(EPSILON))
+        throw "EPSILON appended";
+
     string.push_back(s->clone());
 }
 
 Symbol * SymbolString::symbol_at(std::size_t i) const {
+    if (length() <= i)
+        throw "wrong size";
     return string.at(i);
+}
+
+void SymbolString::truncate(int k) {
+    while (k > 0) {
+        auto it = string.begin() + (string.size() - 1);
+        Symbol *s = *it;
+        string.erase(it);
+        delete s;
+        k--;
+    }
 }
 
 std::size_t SymbolString::length() const {
     return string.size();
 }
 
-SymbolString * SymbolString::reverse() const {
+SymbolString * SymbolString::reversed() const {
     SymbolString *reversed = new SymbolString();
     
     for (auto it = string.rbegin(); it != string.rend(); it++) {

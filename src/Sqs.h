@@ -20,6 +20,7 @@ class SqsKey {
         bool equals(SqsKey const& other) const;
         std::size_t hash() const;
         SqsKey * clone() const;
+        std::string to_string() const;
         ~SqsKey();
 };
 
@@ -58,6 +59,8 @@ class Sqs {
          * Empty the map.
          */
         void clear();
+
+        std::string to_string() const;
 
         ~Sqs();
 };

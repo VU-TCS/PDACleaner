@@ -1,5 +1,7 @@
 #include "Sqs.h"
 
+#include <sstream>
+
 /*** SqsKey  ***/
 
 SqsKey::SqsKey(State *q, SymbolString *s) {
@@ -20,6 +22,10 @@ std::size_t SqsKey::hash() const {
 
 SqsKey * SqsKey::clone() const {
     return new SqsKey(q, s);
+}
+
+std::string SqsKey::to_string() const {
+    return q->to_string() + " , " + s->to_string();
 }
 
 SqsKey::~SqsKey() {
@@ -49,6 +55,16 @@ void Sqs::clear() {
     }
     
     map.clear();
+}
+
+std::string Sqs::to_string() const {
+    std::stringstream ss;
+
+    for (auto it = map.begin(); it != map.end(); it++) {
+        ss << "Key: { " << it->first->to_string() << " }, Value: { " << it->second->to_string("", " ") << " }" << std::endl;
+    }
+
+    return ss.str();
 }
 
 Sqs::~Sqs() {

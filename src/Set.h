@@ -65,15 +65,43 @@ class Set {
          * @param e The element to be removed from this set.
          * @return true if this set contained the specified element.
          */
-        bool remove(T *e) {
+        typename std::unordered_set<T *, H, E>::const_iterator remove(T *e) {
             auto it = set.find(e);
             if (it != set.end()) {
                 T *d = *it;
-                set.erase(*it);
+                it = set.erase(it);
                 delete d;
-                return true;
             }
-            return false;
+
+            return it;
+        }
+
+        /**
+         * Removes all elements in this set that are also contained in the specified set.
+         *
+         * @param other A pointer to the set whose elements are to be removed from this set.
+         */
+        void remove_all(Set<T, H, E> *other) {
+            for (auto it = other->begin(); it != other->end(); it++) {
+                remove(*it);
+            }
+        }
+
+        /**
+         * Retain only the elements in this set that are also contained in the specified set.
+         *
+         * @param other A pointer to the set whose elements are to be retained in this set.
+         */
+        void retain_all(Set<T, H, E> *other) {
+            for (auto it = set.begin(); it != set.end();) {
+                if (!other->contains(*it)) {
+                    T *d = *it;
+                    it = set.erase(it);
+                    delete d;
+                } else {
+                    it++;
+                }
+            }
         }
 
         /**
@@ -188,6 +216,24 @@ class Set {
             }
 
             return clone_set;
+        }
+
+        /**
+         * Returns a pointer to a new set that contains all elements of the current
+         * set that are not contained in other.
+         *
+         * @param other The set whose elements are not to be copied into the new set.
+         * @return A pointer to a set representing the difference of this set minus other.
+         */
+        Set<T, H, E> * difference(Set<T, H, E> *other) const {
+            Set<T, H, E> *diff = new Set<T, H, E>;
+
+            for (auto it = set.begin(); it != set.end(); it++) {
+                if (!other->contains(*it))
+                    diff->add(*it);
+            }
+
+            return diff;
         }
 
         ~Set() {

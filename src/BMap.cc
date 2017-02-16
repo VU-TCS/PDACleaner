@@ -1,5 +1,7 @@
 #include "BMap.h"
 
+#include <sstream>
+
 StateSet * BMap::get(State *q) {
     auto it = map.find(q);
     if (it != map.end()) {
@@ -25,3 +27,14 @@ BMap::~BMap() {
         delete it->second;
     }
 }
+
+std::string BMap::to_string() const {
+    std::stringstream ss;
+
+    for (auto it = map.begin(); it != map.end(); it++) {
+        ss << "Key: { " << *it->first << " } , Value: " << it->second->to_string("", " ")  << std::endl;
+    }
+
+    return ss.str();
+}
+

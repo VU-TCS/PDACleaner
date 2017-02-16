@@ -9,9 +9,9 @@
 #define USAGE_MSG(bin) "Usage: " + bin + " input_file [output_file]\n"
 
 void formatted_output(PDACleanerResult& result, std::ostream& stream) {    
-    stream << "U_1 = " << result.U_1->to_string("\t", "\n") << std::endl;
-    stream << "U_2 = " << result.U_2->to_string("\t", "\n") << std::endl;
-    stream << *result.P_clean << std::endl;
+    stream << "Unreachable transitions:\nU_1 = " << result.U_1->to_string("\t", "\n") << std::endl;
+    stream << "\nNon-terminating transitions:\nU_2 = " << result.U_2->to_string("\t", "\n") << std::endl;
+    stream << "\nCleaned PDA:\n" << *result.P_clean << std::endl;
     stream.flush();
 }
 

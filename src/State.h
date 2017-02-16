@@ -89,9 +89,9 @@ class StateGenerator {
         }
 
         static GeneratedState * get_state() {
-            static int id = 0;
-            id++;
-            return new GeneratedState("q_" + std::to_string(id));
+            static int id = -4;
+            id--;
+            return new GeneratedState(std::to_string(id));
         }
 };
 

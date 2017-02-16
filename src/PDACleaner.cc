@@ -5,6 +5,201 @@
 #include "NFA.h"
 #include "Sqs.h"
 #include "BMap.h"
+#include "StateVisitMap.h"
+
+static void remove_unused_states(PDA *P) {
+    P->get_Q()->clear();
+    
+    for (auto theta = P->get_Delta()->begin(); theta != P->get_Delta()->end(); theta++) {
+       State *q = (*theta)->get_q();
+       State *r = (*theta)->get_r();
+
+       P->get_Q()->add(q);
+       P->get_Q()->add(r);
+    }
+
+    P->get_F()->retain_all(P->get_Q());
+}
+
+static void remove_extensions(PDATransitionSet *U) {
+    for (auto it = U->begin(); it != U->end();) {
+        if ((*it)->get_ext_status() != NO_EXTENSION) {
+            it = U->remove(*it);
+        } else {
+            it++;
+        }
+    }
+}
+
+static int add_eps_transitions_rec (std::size_t s_pos, State *x, SymbolString *sigma, State *q,
+        NFA *N, NFATransitionSet *E, NFATransitionSet *traversed, StateVisitMap *visited) {
+
+    if (visited->has_key(x)) {
+        return visited->get(x);
+    }
+
+    int path = 0;
+
+    for (auto it = N->get_Delta()->begin(); it != N->get_Delta()->end(); it ++) {
+        if (!(*it)->get_q()->equals(*x)) continue;
+
+        Symbol *a = (*it)->get_symbol();
+        State *r = (*it)->get_r(); 
+
+        if (a->equals(EPSILON)) {
+            if (s_pos == 0) continue;
+            if (traversed->contains(*it)) continue;
+
+            traversed->add(*it);
+            int res = add_eps_transitions_rec(s_pos, r, sigma, q, N, E, traversed, visited);
+
+            traversed->remove(*it);
+
+            if (res > 0) {
+                E->add(*it);
+            }
+
+            path += res;
+        }
+
+        if (sigma->length() > s_pos && a->equals(*sigma->symbol_at(s_pos))) {
+            s_pos++;
+            NFATransitionSet traversed_new;
+            StateVisitMap visited_new;
+
+            int res = add_eps_transitions_rec(s_pos, r, sigma, q, N, E, &traversed_new, &visited_new);
+
+            s_pos--;
+            path += res;
+        }
+    }
+
+    if (s_pos >= sigma->length() && x->equals(*q)) {
+        path = 1;
+    }
+
+    visited->put(x, path);
+    return path;
+}
+
+static void add_eps_transitions(State *x,
+        SymbolString *sigma, State *q, NFA *N, NFATransitionSet *E) {
+
+    NFATransitionSet traversed;
+    StateVisitMap visited;
+
+    add_eps_transitions_rec(0, x, sigma, q, N, E, &traversed, &visited);
+}
+
+static int find_finishing_path_rec(State *y, SymbolString **tau, State **r, NFA *N) {
+    if (N->get_F()->contains(y)) {
+        *r = y->clone();
+        return 1;
+    }
+
+    for (auto it = N->get_Delta()->begin(); it != N->get_Delta()->end(); it ++) {
+        State *q = (*it)->get_q();
+
+        if (!q->equals(*y)) continue;
+
+        Symbol *a = (*it)->get_symbol();
+        if (a->equals(EPSILON)) continue;
+
+        State *y_1 = (*it)->get_r();
+
+        (*tau)->append(a);
+
+        int res = find_finishing_path_rec(y_1, tau, r, N);
+
+        if (res > 0) {
+            return 1;
+        }
+
+        (*tau)->truncate(1);
+    }
+
+    return 0;
+}
+
+static void find_finishing_path(State *y, SymbolString **tau, State **r, NFA *N) {
+    *tau = new SymbolString();
+    find_finishing_path_rec(y, tau, r, N);
+    SymbolString *tau_rev = (*tau)->reversed();
+    delete *tau;
+    *tau = tau_rev;
+}
+
+/**
+ * Determines which transitions in P_1 are non-finishing.
+ * Corresponds to Algorithm 3 (procedure backward) in the paper.
+ */
+static void backward(PDA *P_1, NFA *N, PDATransitionSet *U_2,
+        NFATransitionSet *E, NFATransitionSet *G, Sqs *sqs_map) {
+
+    PDATransitionSet *Delta = P_1->get_Delta();
+    NFATransitionSet *E_minus_G = E->difference(G);
+
+    while (!E_minus_G->is_empty()) {
+        // Step 1
+        NFATransition *x_eps_y = *E_minus_G->begin();
+        State *x = x_eps_y->get_q();
+        State *y = x_eps_y->get_r();
+
+        G->add(x_eps_y);
+
+        // Step 2
+        SymbolString *tau = nullptr;
+        State *r = nullptr;
+        find_finishing_path(y, &tau, &r, N);
+
+        // Step 3
+        for (auto theta = Delta->begin(); theta != Delta->end(); theta++) {
+            if (!(*theta)->get_r()->equals(*r)) continue;
+            if (!(*theta)->get_tau()->equals(*tau)) continue;
+
+            State *q = (*theta)->get_q();
+            SymbolString *sigma = (*theta)->get_sigma();
+
+            // Step 3.1
+            if (!sqs_map->get(q, sigma)->contains(x)) continue;
+
+            // Step 3.2
+            U_2->remove(*theta);
+
+            // Step 3.3
+            if (sigma->length() > 0) {
+                add_eps_transitions(x, sigma, q, N, E);
+            }
+        }
+
+        delete tau;
+        delete r;
+        
+        delete E_minus_G;
+        E_minus_G = E->difference(G);
+    }
+
+    delete E_minus_G;
+}
+
+/**
+ * Makes preparations for the backward procedure.
+ */
+static void non_finishing(PDA *P_1, NFA *N, Sqs *sqs_map, PDATransitionSet *U_2) {
+    State *m_0 = N->get_q_0();
+    State *q_f = *P_1->get_F()->begin();
+    NFATransition e(m_0, &EPSILON, q_f);
+
+    if (!N->get_Delta()->contains(&e)) {
+        // The language is empty, so all transitions are useless.
+        return;
+    }
+
+    NFATransitionSet E, G;
+    E.add(&e);
+
+    backward(P_1, N, U_2, &E, &G, sqs_map);
+}
 
 /**
  * Establishes a path (y, a, z) in N and returns State y, which may be a newly created State.
@@ -69,8 +264,9 @@ static StateSet * backwards_epsilon_closure(NFA *N, StateSet *set, BMap *b_map) 
  * Enters this set into the pecified Sqs map.
  */
 static void determine_Sqs(Sqs *sqs_map, State *q, SymbolString *s, NFA *N, BMap *b_map) {
-    SymbolString *s_reversed = s->reverse();
+    SymbolString *s_reversed = s->reversed();
     StateSet *set = sqs_map->get(q, s);
+    set->clear();
     set->add(q);
 
     for (int i = s_reversed->length() - 1; i >= 0; i--) {
@@ -114,7 +310,7 @@ static void forward(PDA *P_0, NFA *N, PDATransitionSet *U_1, Sqs *sqs_map, BMap 
         if (sqs->size() == 0)
             continue;
 
-        SymbolString *tau_reversed = tau->reverse();
+        SymbolString *tau_reversed = tau->reversed();
         
         if (U_1->contains(*theta)) {
             U_1->remove(*theta);
@@ -162,7 +358,7 @@ static NFA * build_NFA(PDA *P_0, PDATransitionSet *U_1, Sqs *sqs_map) {
     BMap *b_map = new BMap();
     
     // Initial state of the NFA
-    GeneratedState m_0("m_0");
+    GeneratedState m_0("-4");
     
     // Stateset of the NFA
     StateSet Q;
@@ -206,9 +402,12 @@ static NFA * build_NFA(PDA *P_0, PDATransitionSet *U_1, Sqs *sqs_map) {
 
 static PDA * simplify_PDA(PDA *P) {
     Bottom b_0;
-    GeneratedState q_0_hat("q_0_hat");
-    GeneratedState q_e("q_e");
-    GeneratedState q_f("q_f");
+//    GeneratedState q_0_hat("q_0_hat");
+//    GeneratedState q_e("q_e");
+//    GeneratedState q_f("q_f");
+    GeneratedState q_0_hat("-1");
+    GeneratedState q_e("-2");
+    GeneratedState q_f("-3");
     SymbolString Z;
     Z.append(&b_0);
     StateSet F;
@@ -252,14 +451,42 @@ PDACleanerResult clean_PDA(PDA *P) {
     Sqs *sqs_map = new Sqs();
     PDA *P_0 = simplify_PDA(P);
 
+    // As an over-approximation, U_1 initially contains all transitions in P_0
     PDATransitionSet *U_1 = P_0->get_Delta()->clone();
-    PDATransitionSet *U_2 = new PDATransitionSet();
     
+    // Build NFA of reachable configurations and only
+    // keep unreachable transitions in U_1.
     NFA *N = build_NFA(P_0, U_1, sqs_map);
 
-    PDACleanerResult result = { U_1, U_2, P_0 };
-    
+    // Creating alias to be consistent with the notation in the paper.
+    PDA *P_1 = P_0;
+
+    // Remove unreachable transitions.
+    P_1->get_Delta()->remove_all(U_1);
+
+    // As an over-approximation, U_2 initially contains all transitions in P_1.
+    PDATransitionSet *U_2 = P_1->get_Delta()->clone();
+
+    // Determine all non-finishing transitions. Only these will be contained in U_2
+    // after the call returns.
+    non_finishing(P_1, N, sqs_map, U_2);
+
+    // Remove extension transitions from U_1 and U_2
+    remove_extensions(U_1);
+    remove_extensions(U_2);
+
+    // Create a clean PDA
+    PDA *P_clean = P->clone();
+    P_clean->get_Delta()->remove_all(U_1);
+    P_clean->get_Delta()->remove_all(U_2);
+
+    // Remove unused states
+    remove_unused_states(P_clean);
+
+    PDACleanerResult result = { U_1, U_2, P_clean };
+
     delete sqs_map;
     delete N;
+    delete P_1;
     return result;
 }

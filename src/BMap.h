@@ -22,6 +22,7 @@ class BMap {
 
         typename std::unordered_map<State *, StateSet *, StateHash, StateEq>::const_iterator begin() const;
         typename std::unordered_map<State *, StateSet *, StateHash, StateEq>::const_iterator end() const;
+        std::string to_string() const;
         ~BMap();
 };
 
