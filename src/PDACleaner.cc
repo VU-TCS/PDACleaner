@@ -1,12 +1,14 @@
 #include "PDACleaner.h"
 
-#include <iostream>
-
 #include "NFA.h"
 #include "Sqs.h"
 #include "BMap.h"
 #include "StateVisitMap.h"
 
+/**
+ * Removes all States from the StateSet and the final StateSet of PDA P
+ * that do not occur in any PDATransition in P.
+ */
 static void remove_unused_states(PDA *P) {
     P->get_Q()->clear();
     
@@ -21,6 +23,9 @@ static void remove_unused_states(PDA *P) {
     P->get_F()->retain_all(P->get_Q());
 }
 
+/**
+ * Removes all PDATransitions marked as extensions from the set U.
+ */
 static void remove_extensions(PDATransitionSet *U) {
     for (auto it = U->begin(); it != U->end();) {
         if ((*it)->get_ext_status() != NO_EXTENSION) {
@@ -31,6 +36,10 @@ static void remove_extensions(PDATransitionSet *U) {
     }
 }
 
+/**
+ * Helper function to recursively find the epsilon transitions mentioned in the description
+ * of add_eps_transitions() (see below).
+ */
 static int add_eps_transitions_rec (std::size_t s_pos, State *x, SymbolString *sigma, State *q,
         NFA *N, NFATransitionSet *E, NFATransitionSet *traversed, StateVisitMap *visited) {
 
@@ -82,15 +91,28 @@ static int add_eps_transitions_rec (std::size_t s_pos, State *x, SymbolString *s
     return path;
 }
 
+/**
+ * Find and add all epsilon transitions to E that occur in any path
+ * from x to q in N by sigma^R. The only restriction being that the first transition
+ * in the path should not be an epsilon transition.
+ *
+ * Corresponds to Algorithm 3 - Step 3 in the paper.
+ */
 static void add_eps_transitions(State *x,
         SymbolString *sigma, State *q, NFA *N, NFATransitionSet *E) {
 
+    // The traversed set and visited map are needed in order to detect
+    // cycles during the recursive operation of finding the epsilon transitions.
     NFATransitionSet traversed;
     StateVisitMap visited;
 
     add_eps_transitions_rec(0, x, sigma, q, N, E, &traversed, &visited);
 }
 
+/**
+ * Helper function to recursively find the epsilon-free path mentioned in the
+ * description of find_finishing_path() (see below).
+ */
 static int find_finishing_path_rec(State *y, SymbolString **tau, State **r, NFA *N) {
     if (N->get_F()->contains(y)) {
         *r = y->clone();
@@ -121,6 +143,12 @@ static int find_finishing_path_rec(State *y, SymbolString **tau, State **r, NFA 
     return 0;
 }
 
+/**
+ * For a given State y, determine SymbolString tau and State r such that am epsilon-free path
+ * (y, tau^R, r) exists in N.
+ *
+ * Corresponds to Algorithm 3 - Step 2 mentioned in the paper.
+ */
 static void find_finishing_path(State *y, SymbolString **tau, State **r, NFA *N) {
     *tau = new SymbolString();
     find_finishing_path_rec(y, tau, r, N);
@@ -168,7 +196,9 @@ static void backward(PDA *P_1, NFA *N, PDATransitionSet *U_2,
 
             // Step 3.3
             if (sigma->length() > 0) {
-                add_eps_transitions(x, sigma, q, N, E);
+                SymbolString *sigma_rev = sigma->reversed();
+                add_eps_transitions(x, sigma_rev, q, N, E);
+                delete sigma_rev;
             }
         }
 
@@ -238,7 +268,7 @@ static State * forward_4(SymbolString *a, State *z, NFA *N, BMap *b_map) {
         delete n_2;
         n_2 = n_1;
 
-        if (k > 1)
+        if (i > 0)
             n_1 = StateGenerator::get_state();
     }
 

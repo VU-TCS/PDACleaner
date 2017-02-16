@@ -1,0 +1,37 @@
+Unreachable transitions:
+U_1 = {
+}
+
+Non-terminating transitions:
+U_2 = {
+	(18, "AFG", "a", 4, "FEFHH")
+}
+
+Cleaned PDA:
+PDA5 = {
+	Q = { 0 16 10 8 2 18 3 9 14 17 5 13 },
+	Gamma = { E F G H D C B A },
+	Delta = {
+		(13, "B", "r", 5, "GDFCHH")
+		(17, "AGD", "z", 14, "GEACEHEG")
+		(14, "G", "o", 9, "B")
+		(9, "BEACE", "r", 3, "BBEF")
+		(3, "", "y", 18, "GCCCB")
+		(18, "GC", "k", 14, "HH")
+		(2, "BBEFHE", "j", 18, "AF")
+		(3, "DHA", "g", 2, "")
+		(8, "DCAFA", "t", 13, "EAEABG")
+		(13, "EAEA", "q", 10, "EADB")
+		(10, "EADBB", "e", 3, "HFE")
+		(3, "H", "x", 17, "AGDGG")
+		(16, "", "p", 8, "DCAFA")
+		(5, "GDFCH", "q", 16, "CEHDBE")
+		(0, "G", "i", 0, "GDEHBD")
+		(0, "", "a", 0, "CCE")
+		(0, "", "i", 13, "BB")
+		(14, "HHCCB", "z", 3, "DHA")
+	},
+	Z = "GE",
+	q_0 = 0,
+	F = { 18 }
+}
