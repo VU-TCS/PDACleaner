@@ -95,15 +95,10 @@ Epsilon EPSILON;
 /*** SymbolString ***/
 
 void SymbolString::append(Symbol *s) {
-    if (s->equals(EPSILON))
-        throw "EPSILON appended";
-
     string.push_back(s->clone());
 }
 
 Symbol * SymbolString::symbol_at(std::size_t i) const {
-    if (length() <= i)
-        throw "wrong size";
     return string.at(i);
 }
 

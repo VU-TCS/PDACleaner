@@ -1,0 +1,20 @@
+Unreachable transitions:
+U_1 = {
+}
+
+Non-terminating transitions:
+U_2 = {
+}
+
+Cleaned PDA:
+PDA2 = {
+	Q = { 0 1 },
+	Gamma = { B A },
+	Delta = {
+		(1, "AB", "z", 0, "A")
+		(0, "A", "w", 1, "ABB")
+	},
+	Z = "A",
+	q_0 = 0,
+	F = { 0 }
+}

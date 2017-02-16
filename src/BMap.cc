@@ -21,13 +21,6 @@ typename std::unordered_map<State *, StateSet *, StateHash, StateEq>::const_iter
     return map.end();
 }
 
-BMap::~BMap() {
-    for (auto it = map.begin(); it != map.end(); it++) {
-        delete it->first;
-        delete it->second;
-    }
-}
-
 std::string BMap::to_string() const {
     std::stringstream ss;
 
@@ -36,5 +29,12 @@ std::string BMap::to_string() const {
     }
 
     return ss.str();
+}
+
+BMap::~BMap() {
+    for (auto it = map.begin(); it != map.end(); it++) {
+        delete it->first;
+        delete it->second;
+    }
 }
 

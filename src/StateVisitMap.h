@@ -7,7 +7,7 @@
 
 /**
  * A State-int map used to count visits to each State as part of
- * the add_eps_transitions function in the PDACleaner.
+ * the add_eps_transitions() function in the PDACleaner.
  */
 class StateVisitMap {
     private:

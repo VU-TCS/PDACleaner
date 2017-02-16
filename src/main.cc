@@ -8,10 +8,16 @@
 
 #define USAGE_MSG(bin) "Usage: " + bin + " input_file [output_file]\n"
 
-void formatted_output(PDACleanerResult& result, std::ostream& stream) {    
-    stream << "Unreachable transitions:\nU_1 = " << result.U_1->to_string("\t", "\n") << std::endl;
-    stream << "\nNon-terminating transitions:\nU_2 = " << result.U_2->to_string("\t", "\n") << std::endl;
-    stream << "\nCleaned PDA:\n" << *result.P_clean << std::endl;
+void formatted_output(PDACleanerResult& result, std::ostream& stream) {
+    stream << "Unreachable transitions:" << std::endl;
+    stream << "U_1 = " << result.U_1->to_string("\t", "\n") << std::endl << std::endl;
+    
+    stream << "Non-terminating transitions:" << std::endl;
+    stream << "U_2 = " << result.U_2->to_string("\t", "\n") << std::endl << std::endl;
+
+    stream << "Cleaned PDA:" << std::endl;
+    stream << *result.P_clean << std::endl;
+    
     stream.flush();
 }
 
@@ -24,6 +30,7 @@ void print_result(int argc, char **argv, PDACleanerResult& result) {
             formatted_output(result, std::cout);
         } else {
             formatted_output(result, file_stream);
+            std::cout << "Output written to file: " << argv[2] << std::endl;
         }
 
         file_stream.close();

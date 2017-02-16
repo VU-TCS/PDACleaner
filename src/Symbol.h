@@ -116,11 +116,28 @@ class SymbolString {
         }
 
         void append(Symbol *s);
+        
         Symbol * symbol_at(std::size_t i) const;
+
+        /**
+         * Drops the last k Symbols from the string.
+         */
         void truncate(int k);
+
         std::size_t length() const;
+
+        /**
+         * Returns a pointer to a new SymbolString object with all the Symbols
+         * of the current SymbolString in reverse order.
+         */
         SymbolString * reversed() const;
+
+        /**
+         * Returns a pointer to a new SymbolString object with the first length() - k
+         * Symbols of the current SymbolString.
+         */
         SymbolString * truncated(std::size_t k) const;
+        
         bool equals(SymbolString const& other) const;
         std::size_t hash() const;
         std::string to_string() const;

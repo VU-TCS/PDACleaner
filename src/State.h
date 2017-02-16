@@ -44,6 +44,9 @@ class SimpleState : public State {
 /**
  * A State that is composed of two other State objects.
  * The order that the two State objects are passed to the constructor matters.
+ *
+ * This type will be useful for eventual implementations of alternative algorithms,
+ * but is currently not used.
  */
 class PairState : public State {
     private:

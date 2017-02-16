@@ -12,7 +12,7 @@
  * Type T has to have a clone() method that returns a pointer to a deep copy
  * of the object.
  *
- * H is a unary function object type that an object of type T as argument
+ * H is a unary function object type that takes an object of type T as an argument
  * and returns a unique value of type size_t based on that object.
  *
  * E is a binary predicate that takes two objects of type T and returns a bool.
@@ -50,7 +50,7 @@ class Set {
         /**
          * Adds all elements of the other set to this set.
          *
-         * @param other A pointer to the the set whose elements are to be added.
+         * @param other A pointer to the set whose elements are to be added.
          */
         void add_all(Set<T, H, E> *other) {
             for (auto it = other->begin(); it != other->end(); it++) {
@@ -60,10 +60,10 @@ class Set {
 
         /**
          * Removes the specified element from this set if it is present.
-         * Returns true if this set changed as a result of the call.
+         * Returns the next valid iterator to be used in for-loops.
          *
          * @param e The element to be removed from this set.
-         * @return true if this set contained the specified element.
+         * @return the next valid iterator.
          */
         typename std::unordered_set<T *, H, E>::const_iterator remove(T *e) {
             auto it = set.find(e);

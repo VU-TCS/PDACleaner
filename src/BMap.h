@@ -16,7 +16,7 @@ class BMap {
     public:
         /**
          * Returns the StateSet mapped to the specified State.
-         * If such a set does not exist, one is allocated and returned.
+         * If such a set does not exist, an empty one is allocated and returned.
          */
         StateSet * get(State *q);
 
