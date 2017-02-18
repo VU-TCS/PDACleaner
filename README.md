@@ -3,7 +3,7 @@
 PDACleaner detects and removes useless transitions (i.e. transitions that are not used in any terminating run)
 from a Pushdown Automaton (PDA). It does so by using the algorithm presented in the following paper.
 
-> D. Grune, W. Fokkink, E. Chatzikalymnios, B. Hond, and P. Rutgers. Detecting Useless Transitions n Pushdown Automata. Language and Automata Theory and Applications, 2017.
+> D. Grune, W. Fokkink, E. Chatzikalymnios, B. Hond, and P. Rutgers. Detecting Useless Transitions in Pushdown Automata. Language and Automata Theory and Applications, 2017.
 
 Note that PDACleaner is not the prototype implementation mentioned in the paper.
 
