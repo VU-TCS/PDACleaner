@@ -162,7 +162,11 @@ std::string SymbolString::to_string() const {
 
     ss << "\"";
     for (auto it = string.begin(); it != string.end(); it++) {
-        ss << **it;
+        if (dynamic_cast<Identifier *> (*it)) {
+            ss << " " << **it << " ";
+        } else {
+            ss << **it;
+        }
     }
     ss << "\"";
 

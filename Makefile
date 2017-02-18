@@ -27,7 +27,7 @@ TARGET = $(BINDIR)/$(APPNAME)
 #      Test directories      #
 ##############################
 
-TDIR = tests
+TDIR = test
 TSRCDIR = $(TDIR)/src
 TBUILDDIR = $(TDIR)/build
 TTARGET = $(TDIR)/run

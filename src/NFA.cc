@@ -41,12 +41,12 @@ bool NFA::equals(NFA const& other) const {
 std::string NFA::to_string() const {
     std::stringstream ss;
 
-    ss << "{" << std::endl;
-    ss << "\tQ = " << Q->to_string("", " ") << "," << std::endl;
-    ss << "\tSigma = " << Sigma->to_string("", " ") << "," << std::endl;
-    ss << "\tDelta = " << Delta->to_string("\t", "\n\t") << "," << std::endl;;
-    ss << "\tq_0 = " << *q_0 << "," << std::endl;
-    ss << "\tF = " << F->to_string("", " ") << "," << std::endl;
+    ss << "{\n";
+    ss << "\tQ = " << Q->to_string("", " ") << ",\n";
+    ss << "\tSigma = " << Sigma->to_string("", " ") << ",\n";
+    ss << "\tDelta = " << Delta->to_string("\t", "\n\t") << ",\n";;
+    ss << "\tq_0 = " << *q_0 << ",\n";
+    ss << "\tF = " << F->to_string("", " ") << ",\n";
     ss << "}";
 
     return ss.str();

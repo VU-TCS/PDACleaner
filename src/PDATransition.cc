@@ -2,7 +2,7 @@
 
 #include <sstream>
 
-PDATransition::PDATransition(State *q, SymbolString *sigma, char symbol, State *r, SymbolString *tau, ExtensionStatus extension) {
+PDATransition::PDATransition(State *q, SymbolString *sigma, std::string symbol, State *r, SymbolString *tau, ExtensionStatus extension) {
     this->q = q->clone();
     this->sigma = sigma->clone();
     this->symbol = symbol;
@@ -19,7 +19,7 @@ SymbolString * PDATransition::get_sigma() {
     return sigma;
 }
 
-char PDATransition::get_symbol() {
+std::string PDATransition::get_symbol() {
     return symbol;
 }
 
@@ -48,7 +48,7 @@ std::size_t PDATransition::hash() const {
     std::size_t res = 17;
     res = res * 19 * q->hash();
     res = res * 23 * sigma->hash();
-    res = res * 29 * std::hash<char>{}(symbol);
+    res = res * 29 * std::hash<std::string>{}(symbol);
     res = res * 31 * r->hash();
     res = res * 37 * tau->hash();
     res = res * 7 * std::hash<short>{}(extension);

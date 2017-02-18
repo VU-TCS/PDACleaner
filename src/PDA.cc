@@ -49,13 +49,13 @@ bool PDA::equals(PDA const& other) const {
 std::string PDA::to_string() const {
     std::stringstream ss;
 
-    ss << name << " = {" << std::endl;
-    ss << "\tQ = " << Q->to_string("", " ") << "," << std::endl;
-    ss << "\tGamma = " << Gamma->to_string("", " ") << "," << std::endl;
-    ss << "\tDelta = " << Delta->to_string("\t", "\n\t") << "," << std::endl;
-    ss << "\tZ = " << *Z << "," << std::endl;
-    ss << "\tq_0 = " << *q_0 << "," << std::endl;
-    ss << "\tF = " << F->to_string("", " ") << std::endl;
+    ss << name << " = {\n";
+    ss << "\tQ = " << Q->to_string("", " ") << ",\n";
+    ss << "\tGamma = " << Gamma->to_string("", " ") << ",\n";
+    ss << "\tDelta = " << Delta->to_string("\t", "\n\t") << ",\n";
+    ss << "\tZ = " << *Z << ",\n";
+    ss << "\tq_0 = " << *q_0 << ",\n";
+    ss << "\tF = " << F->to_string("", " ") << "\n";
     ss << "}";
 
     return ss.str();

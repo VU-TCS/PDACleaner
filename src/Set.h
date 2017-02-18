@@ -83,7 +83,7 @@ class Set {
          */
         void remove_all(Set<T, H, E> *other) {
             for (auto it = other->begin(); it != other->end(); it++) {
-                remove(*it);
+                set.erase(*it);
             }
         }
 

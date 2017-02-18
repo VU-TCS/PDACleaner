@@ -26,34 +26,59 @@ static void read_char(std::ifstream& input, char c) {
     }
 }
 
-static char read_input_symbol(std::ifstream& input) {
+static std::string read_input_symbol(std::ifstream& input) {
     read_char(input, '"');
     
-    char c;
-    if ((c = (input >> std::ws).peek()) != '"') {
-        input >> c;
-    } else {
-        c = 0;
+    char curr = 0;
+    char prev = 0;
+    std::stringstream ss;
+    
+    curr = input.peek();
+    
+    while (!(curr == '"' && prev != '\\')) {
+        input >> curr;
+        ss << curr;
+        
+        prev = curr;
+        curr = input.peek();
     }
 
     read_char(input, '"');
-    return c;
+    return ss.str();
 }
 
-static Symbol * read_Symbol(std::ifstream& input) {
-    char c;
-    input >> c;
-    return new Character(c);
+static Symbol * read_Symbol(std::ifstream& input, SymbolMode mode) {
+    if (mode == CHARACTER) {
+        char c;
+        input >> c;
+        return new Character(c);
+    }
+
+    char curr = 0;
+    char prev = 0;
+    std::stringstream ss;
+    
+    curr = input.peek();
+    
+    while (curr != ' ' && !(curr == '"' && prev != '\\')) {
+        input >> curr;
+        ss << curr;
+        
+        prev = curr;
+        curr = input.peek();
+    }
+
+    return new Identifier(ss.str());
 }
 
-static SymbolString * read_SymbolString(std::ifstream& input, SymbolSet *Gamma) {
+static SymbolString * read_SymbolString(std::ifstream& input, SymbolSet *Gamma, SymbolMode mode) {
     read_char(input, '"');
     
     SymbolString *str = new SymbolString;
     char c;
 
     while ((c = (input >> std::ws).peek()) != '"') {
-        Symbol *s = read_Symbol(input);
+        Symbol *s = read_Symbol(input, mode);
         str->append(s);
 
         if (!Gamma->contains(s)) {
@@ -120,13 +145,13 @@ static State * read_q_0(std::ifstream& input, StateSet *Q) {
     return q_0;
 }
 
-static SymbolString * read_Z(std::ifstream& input, SymbolSet *Gamma) {
+static SymbolString * read_Z(std::ifstream& input, SymbolSet *Gamma, SymbolMode mode) {
     read_char(input, 'Z');
     read_char(input, '=');
-    return read_SymbolString(input, Gamma);
+    return read_SymbolString(input, Gamma, mode);
 }
 
-static PDATransition * read_PDATransition(std::ifstream& input, StateSet *Q, SymbolSet *Gamma) {
+static PDATransition * read_PDATransition(std::ifstream& input, StateSet *Q, SymbolSet *Gamma, SymbolMode mode) {
     read_char(input, '(');
     
     State *q = read_State(input);
@@ -139,10 +164,10 @@ static PDATransition * read_PDATransition(std::ifstream& input, StateSet *Q, Sym
     }
     read_char(input, ',');
 
-    SymbolString *sigma = read_SymbolString(input, Gamma);
+    SymbolString *sigma = read_SymbolString(input, Gamma, mode);
     read_char(input, ',');
 
-    char symbol = read_input_symbol(input);
+    std::string symbol = read_input_symbol(input);
     read_char(input, ',');
     
     State *r = read_State(input);
@@ -155,7 +180,7 @@ static PDATransition * read_PDATransition(std::ifstream& input, StateSet *Q, Sym
     }
     read_char(input, ',');
     
-    SymbolString *tau = read_SymbolString(input, Gamma);
+    SymbolString *tau = read_SymbolString(input, Gamma, mode);
     read_char(input, ')');
 
     PDATransition *t = new PDATransition(q, sigma, symbol, r, tau);
@@ -168,7 +193,7 @@ static PDATransition * read_PDATransition(std::ifstream& input, StateSet *Q, Sym
     return t;
 }
 
-static PDATransitionSet * read_Delta(std::ifstream& input, StateSet *Q, SymbolSet *Gamma) {
+static PDATransitionSet * read_Delta(std::ifstream& input, StateSet *Q, SymbolSet *Gamma, SymbolMode mode) {
     read_word(input, "Delta");
     read_char(input, '=');
     read_char(input, '{');
@@ -177,7 +202,7 @@ static PDATransitionSet * read_Delta(std::ifstream& input, StateSet *Q, SymbolSe
     char c;
 
     while ((c = (input >> std::ws).peek()) != '}') {
-        PDATransition *t = read_PDATransition(input, Q, Gamma);
+        PDATransition *t = read_PDATransition(input, Q, Gamma, mode);
         Delta->add(t);
         delete t;
     }
@@ -186,7 +211,7 @@ static PDATransitionSet * read_Delta(std::ifstream& input, StateSet *Q, SymbolSe
     return Delta;
 }
 
-static SymbolSet * read_Gamma(std::ifstream& input) {
+static SymbolSet * read_Gamma(std::ifstream& input, SymbolMode mode) {
     read_word(input, "Gamma");
     read_char(input, '=');
     read_char(input, '{');
@@ -195,7 +220,7 @@ static SymbolSet * read_Gamma(std::ifstream& input) {
     char c;
 
     while ((c = (input >> std::ws).peek()) != '}') {
-        Symbol *s = read_Symbol(input);
+        Symbol *s = read_Symbol(input, mode);
         Gamma->add(s);
         delete s;
     }
@@ -228,7 +253,7 @@ static std::string read_name(std::ifstream& input) {
     return name;
 }
 
-PDA * parse_PDA(std::ifstream& input) {
+PDA * parse_PDA(std::ifstream& input, SymbolMode mode) {
     std::string name = read_name(input);
     read_char(input, '=');
     read_char(input, '{');
@@ -236,13 +261,13 @@ PDA * parse_PDA(std::ifstream& input) {
     StateSet *Q = read_Q(input);
     read_char(input, ',');
 
-    SymbolSet *Gamma = read_Gamma(input);
+    SymbolSet *Gamma = read_Gamma(input, mode);
     read_char(input, ',');
     
-    PDATransitionSet *Delta = read_Delta(input, Q, Gamma);
+    PDATransitionSet *Delta = read_Delta(input, Q, Gamma, mode);
     read_char(input, ',');
     
-    SymbolString *Z = read_Z(input, Gamma);
+    SymbolString *Z = read_Z(input, Gamma, mode);
     read_char(input, ',');
 
     State *q_0 = read_q_0(input, Q);

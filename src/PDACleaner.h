@@ -28,6 +28,6 @@ struct PDACleanerResult {
  * @param P A pointer to the PDA to clean.
  * @return A PDACleanerResult object.
  */
-PDACleanerResult clean_PDA(PDA *P);
+PDACleanerResult clean_PDA(PDA *P, bool clean);
 
 #endif /* PDACLEANER_H */

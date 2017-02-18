@@ -14,7 +14,7 @@ class PDATransition {
     private:
         State *q;
         SymbolString *sigma;
-        char symbol;
+        std::string symbol;
         State *r;
         SymbolString *tau;
         enum ExtensionStatus extension;
@@ -28,11 +28,11 @@ class PDATransition {
             return strm << self.to_string();
         }
 
-        PDATransition(State *q, SymbolString *sigma, char symbol, State *r, SymbolString *tau, ExtensionStatus extension = NO_EXTENSION);
+        PDATransition(State *q, SymbolString *sigma, std::string symbol, State *r, SymbolString *tau, ExtensionStatus extension = NO_EXTENSION);
 
         State * get_q();
         SymbolString * get_sigma();
-        char get_symbol();
+        std::string get_symbol();
         State * get_r();
         SymbolString * get_tau();
         ExtensionStatus get_ext_status();

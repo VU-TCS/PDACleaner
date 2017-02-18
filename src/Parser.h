@@ -3,6 +3,8 @@
 
 #include "PDA.h"
 
+enum SymbolMode { CHARACTER, IDENTIFIER };
+
 /**
  * Reads in a PDA from the provided stream.
  * Returns a pointer to a heap-allocated PDA object. The caller is responsible
@@ -11,6 +13,6 @@
  * @param input The input stream to read the PDA from.
  * @return A pointer to a PDA object allocated on the heap.
  */
-PDA * parse_PDA(std::ifstream& input);
+PDA * parse_PDA(std::ifstream& input, SymbolMode mode);
 
 #endif /* PARSER_H */
