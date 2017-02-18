@@ -59,3 +59,22 @@ TEST_F(SymbolTest, StringTruncate) {
     EXPECT_TRUE(exp.equals(*trunc));
     delete trunc;
 }
+
+TEST_F(SymbolTest, SetDifference) {
+    SymbolSet set;
+    set.add(A);
+    set.add(B);
+    set.add(C);
+
+    SymbolSet other;
+    other.add(B);
+
+    SymbolSet exp;
+    exp.add(A);
+    exp.add(C);
+
+    SymbolSet *out = set.difference(&other);
+    
+    EXPECT_EQ(exp, *out);
+    delete out;
+}
