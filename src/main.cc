@@ -75,8 +75,12 @@ std::string usage(char **argv) {
 void parse_arguments(int argc, char **argv, SymbolMode& mode, bool& clean, std::string& input, std::string& output) {
     int c = 0;
 
-    while ((c = getopt(argc, argv, "ci")) != - 1) {
+    while ((c = getopt(argc, argv, "hci")) != - 1) {
         switch (c) {
+            case 'h':
+                std::cout << usage(argv);
+                exit(EXIT_SUCCESS);
+                break;
             case 'c':
                 clean = true;
                 break;

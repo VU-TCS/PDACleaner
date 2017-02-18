@@ -7,9 +7,6 @@
  * Represents a state in a PDA.
  */
 class State {
-    private:
-        int id;
-
     public:
         friend bool operator==(State const& lhs, State const& rhs) {
             return lhs.equals(rhs);

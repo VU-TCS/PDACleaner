@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -O3 -Wall -Werror
+CFLAGS = -O3 -Wall -Werror -std=c++11
 
 # Compiler flags for automatic dependency generation
 DEPFLAGS = -MT $@ -MMD
