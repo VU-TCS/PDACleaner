@@ -17,7 +17,7 @@ Note that when using the `samples/C_Grammar.txt` input file, the `-i` option nee
 (see below for more info).
 
 Also note that the file `samples/PDAN.txt` contains an example PDA that exhibits the worst case performance
-of the algorithm, as described in the paper, so using it as input will lead to excessive an excessive run time.
+of the algorithm, as described in the paper, so using it as input will lead to an excessive run time.
 
 ## Usage
 
