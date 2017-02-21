@@ -7,10 +7,19 @@ from a Pushdown Automaton (PDA). It does so by using the algorithm presented in 
 
 Note that PDACleaner is not the prototype implementation mentioned in the paper.
 
-## Usage
+## Samples
 
-The `samples` directory contains some examples of PDAs that can be used as input for PDACleaner. Follow the same template when creating your own input. The directory `samples/reference` contains the expected output for each of the provided PDAs.
-Note that when using the `samples/C_Grammar.txt` input file, the `-i` option needs to be passed to PDACleaner.
+The `samples` directory contains some examples of PDAs that can be used as input for PDACleaner.
+Follow the same template when creating your own input.
+The directory `samples/reference` contains the expected output for each of the provided PDAs.
+
+Note that when using the `samples/C_Grammar.txt` input file, the `-i` option needs to be passed to PDACleaner
+(see below for more info).
+
+Also note that the file `samples/PDAN.txt` contains an example PDA that exhibits the worst case performance
+of the algorithm, as described in the paper, so using it as input will lead to excessive an excessive run time.
+
+## Usage
 
 In order to use the tool, clone this reposiroty and run the following.
 ```sh
